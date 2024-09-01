@@ -1,0 +1,95 @@
+C:\Users\61420\Jenkins
+nano Jenkinsfile
+pipeline {
+    agent any
+
+    stages {
+        stage('Build') {
+            steps {
+                script {
+                    echo 'Building the application...'
+                    // Example using Maven
+                    sh 'mvn clean install'
+                }
+            }
+        }
+
+        stage('Unit and Integration Tests') {
+            steps {
+                script {
+                    echo 'Running unit and integration tests...'
+                    // Example using JUnit
+                    sh 'mvn test'
+                }
+            }
+        }
+
+        stage('Code Analysis') {
+            steps {
+                script {
+                    echo 'Analyzing code quality...'
+                    // Example using SonarQube
+                    sh 'mvn sonar:sonar'
+                }
+            }
+        }
+
+        stage('Security Scan') {
+            steps {
+                script {
+                    echo 'Performing security scan...'
+                    // Example using OWASP Dependency Check
+                    sh 'mvn org.owasp:dependency-check-maven:check'
+                }
+            }
+        }
+
+        stage('Deploy to Staging') {
+            steps {
+                script {
+                    echo 'Deploying to staging server...'
+                    // Example using SCP to deploy
+                    sh 'scp -r target/your-app.war user@staging-server:/path/to/deploy'
+                }
+            }
+        }
+
+        stage('Integration Tests on Staging') {
+            steps {
+                script {
+                    echo 'Running integration tests on staging...'
+                    // Example: Custom script or tool
+                    sh './run-integration-tests.sh'
+                }
+            }
+        }
+
+        stage('Deploy to Production') {
+            steps {
+                script {
+                    echo 'Deploying to production server...'
+                    // Example using SCP to deploy
+                    sh 'scp -r target/your-app.war user@production-server:/path/to/deploy'
+                }
+            }
+        }
+    }
+
+    post {
+        always {
+            echo 'Pipeline completed'
+        }
+        success {
+            mail to: 'youremail@example.com',
+                 subject: "Jenkins Build Successful: ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
+                 body: "Build successful. Check logs for more details.",
+                 attachLog: true
+        }
+        failure {
+            mail to: 'youremail@example.com',
+                 subject: "Jenkins Build Failed: ${env.JOB_NAME} [${env.BUILD_NUMBER}]",
+                 body: "Build failed. Check logs for more details.",
+                 attachLog: true
+        }
+    }
+}
